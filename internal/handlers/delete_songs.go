@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"music-api/internal/config"
+	"music-api/internal/models"
 	"net/http"
 	"strconv"
 
@@ -16,13 +18,11 @@ func DeleteSong(c *gin.Context) {
 		return
 	}
 
-	for i, song := range Songs {
-		if song.ID == uint(id) {
-			Songs = append(Songs[:i], Songs[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "Song deleted"})
-			return
-		}
-
+	if err := config.DB.Delete(&models.Song{}, id).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error deleting song"})
+		return
 	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Song not found"})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Song deleted"})
+
 }

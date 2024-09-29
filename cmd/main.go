@@ -10,8 +10,10 @@ import (
 func main() {
 	// Инициализация конфигурации
 	config.LoadConfig()
+	config.ConnectDatabase()
 
 	r := gin.Default()
+	routers.SetupRoutes(r)
 
 	// Настройка маршрутов
 	routers.SetupRoutes(r)

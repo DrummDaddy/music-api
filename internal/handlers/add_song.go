@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"music-api/internal/config"
 	"music-api/internal/models"
 	"net/http"
 
@@ -18,6 +19,12 @@ func AddSong(c *gin.Context) {
 	if err := c.ShouldBindJSON(&newSong); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON data"})
 		return
+	}
+
+	if err := config.DB.Create(&newSong).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not add song to database"})
+		return
+
 	}
 
 	// Получение информации о песне из внешнего API

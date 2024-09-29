@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"music-api/internal/config"
 	"music-api/internal/models"
 	"net/http"
 	"strconv"
@@ -14,6 +15,21 @@ func GetSongs(c *gin.Context) {
 	albumFilter := c.Query("album")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	query := config.DB
+	if artistFilter != "" {
+		query = query.Where("artist = ?", artistFilter)
+	}
+	if albumFilter != "" {
+		query = query.Where("album = ?", albumFilter)
+	}
+
+	if err := query.Limit(limit).Offset((page - 1) * limit).Find(&Songs).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error retreving songs"})
+		return
+	}
+
+	c.JSON(http.StatusOK, Songs)
 
 	var filteredSongs []models.Song
 
