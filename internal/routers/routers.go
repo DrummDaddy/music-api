@@ -7,9 +7,7 @@ import (
 )
 
 func SetupRoutes(router *gin.Engine) {
-	api := router.Group("/api/v1")
-	{
-		api.GET("songs", handlers.GetAllSongs)
-	}
+	router.GET("/songs", handlers.GetSongs)
+	router.GET("/songs/:id", handlers.GetSongByID)
 
 }

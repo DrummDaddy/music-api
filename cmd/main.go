@@ -14,7 +14,6 @@ func main() {
 	r := gin.Default()
 
 	// Настройка маршрутов
-
 	routers.SetupRoutes(r)
 
 	// Запуск сервера
