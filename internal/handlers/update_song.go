@@ -8,8 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var Songs []models.Song
-
 // Метод для изменения данных песни
 func UpdateSong(c *gin.Context) {
 	idParam := c.Param("id")
