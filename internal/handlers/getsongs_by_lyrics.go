@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -9,9 +10,11 @@ import (
 
 // Метод для получения текста песни с пагинацией по куплетам
 func GetLyrics(c *gin.Context) {
+	log.Println("DEBUG: Getlyrics request receved")
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
+		log.Printf("INFO: Invalid ID provaided: %s", idParam)
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 		return
 	}
@@ -31,5 +34,6 @@ func GetLyrics(c *gin.Context) {
 			return
 		}
 	}
+	log.Printf("INFO: Error song not found, %d", id)
 	c.JSON(http.StatusNotFound, gin.H{"message": "Song not found"})
 }
