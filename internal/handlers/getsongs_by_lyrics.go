@@ -8,6 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Получение текста песни
+// @Description Возвращает текст песни с пагинацией по куплетам
+// @Tags Пенси
+// @Param id path int true "ID песни"
+// @Param page query int false "Номер страницы" default(1)
+// @Param limit query int false "Количество куплетов на странице" default(1)
+// @Success 200 {array} string
+// @Failure 400 {object} gin.H "Invalid ID"
+// @Failure 404 {object} gin.H "Song not found"
+// @Router /songs/{id}/lyrics [get]
+
 // Метод для получения текста песни с пагинацией по куплетам
 func GetLyrics(c *gin.Context) {
 	log.Println("DEBUG: Get song by lirycs request receved")

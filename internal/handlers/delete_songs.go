@@ -10,6 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Удаление песни
+// @Description Удаляет песню по указанному ID
+// @Tags Песни
+// @Param id path int true "ID песни"
+// @Success 200 {object} gin.H "Song deleted"
+// @Failure 400 {object} gin.H "Invalid ID"
+// @Failure 500 {object} gin.H "Error deleting song"
+// @Router /song/{id} [delete]
+
 // Метод для удаления песни
 func DeleteSong(c *gin.Context) {
 	idParam := c.Param("id")

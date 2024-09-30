@@ -12,6 +12,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Добавление новой песни
+// @Description Добавляет новую песню в библиотеку
+// @Tags Песни
+// @Param song body models.Song true "Данные новой песни"
+// @Success 201 {object} models.Song
+// @Failure 400 {object} gin.H "Invalid JSON data"
+// @Failure 500 {object} gin.H "Could not add song data base"
+// @Router /songs [post]
+
 var Songs []models.Song
 
 // Метод для добавления новой песни

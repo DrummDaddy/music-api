@@ -10,6 +10,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Получение списка песен
+// @Description Возвращает список песен с возможностью фильтрации по исполнителю и альбому
+// @Tags Песни
+// @Param artist querry string false "Имя исполнителя"
+// @Param album querry string false "Название альбома"
+// @Param page querry int false "Номер страницы" default(1)
+// @Param limit querry int false "Количество на странице" default(10)
+// @Succes 200 {array} models.Song
+// @Failure 500 {object} gin.H "Error retrieving songs"
+// @Router /songs [get]
+
 // Метод для получения данных библиотеки с фильтрацией и пагинацией
 func GetSongs(c *gin.Context) {
 	artistFilter := c.Query("artist")

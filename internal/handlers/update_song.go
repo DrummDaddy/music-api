@@ -9,6 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Изменение данных песни
+// @Description Обновляет инфорацию о песне по указанному ID
+// @Tags Песни
+// @Param id path int true "ID песни"
+// @Param song body models.Song true "Обновленные данные о песне"
+// @Success 200 {object} models.Song
+// @Failure 400 {object} gin.H "Invalid ID or data"
+// @Failure 404 {object} gin.H "Song not found"
+// @Router /songs/{id} [put]
+
 // Метод для изменения данных песни
 func UpdateSong(c *gin.Context) {
 	log.Println("DEBUG: Get song by lirycs request receved")
