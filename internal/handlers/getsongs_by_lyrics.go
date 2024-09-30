@@ -10,7 +10,7 @@ import (
 
 // Метод для получения текста песни с пагинацией по куплетам
 func GetLyrics(c *gin.Context) {
-	log.Println("DEBUG: Getlyrics request receved")
+	log.Println("DEBUG: Get song by lirycs request receved")
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
