@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"music-api/internal/config"
+	"music-api/internal/logger"
+
 	"music-api/internal/models"
 	"net/http"
 
@@ -18,8 +20,13 @@ import (
 // @Param song body models.Song true "Данные новой песни"
 // @Success 201 {object} models.Song
 // @Failure 400 {object} gin.H "Invalid JSON data"
-// @Failure 500 {object} gin.H "Could not add song data base"
+// @Failure 500 {object} gin.H "Could not add song data base"s
 // @Router /songs [post]
+
+// InitializeLogger инициализирует кастомный логгер для пакета
+func InitializeLogger(customLogger *logger.Logger) {
+	appLog = customLogger
+}
 
 var Songs []models.Song
 

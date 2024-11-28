@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"log"
 	"music-api/internal/config"
+	"music-api/internal/logger"
 	"music-api/internal/models"
 	"net/http"
 	"strconv"
@@ -10,52 +10,61 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Получение списка песен
-// @Description Возвращает список песен с возможностью фильтрации по исполнителю и альбому
-// @Tags Песни
-// @Param artist querry string false "Имя исполнителя"
-// @Param album querry string false "Название альбома"
-// @Param page querry int false "Номер страницы" default(1)
-// @Param limit querry int false "Количество на странице" default(10)
-// @Succes 200 {array} models.Song
-// @Failure 500 {object} gin.H "Error retrieving songs"
-// @Router /songs [get]
+// log – глобальная переменная для логирования в этом пакете.
+var appLog *logger.Logger
 
-// Метод для получения данных библиотеки с фильтрацией и пагинацией
+// InitLogger инициализирует логгер для использования в этом пакете.
+func InitLogger(customLogger *logger.Logger) {
+	appLog = customLogger
+}
+
+// GetSongs обрабатывает HTTP-запросы на получение песен.
+// Он поддерживает фильтрацию по артисту и альбому, а также пагинацию.
 func GetSongs(c *gin.Context) {
+
 	artistFilter := c.Query("artist")
 	albumFilter := c.Query("album")
+
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
-	log.Printf("DEBUG: Fetching songs with artist filter: %s and album filter: %s", artistFilter, albumFilter)
+	// Логируем информацию о начале процесса получения песен с параметрами фильтрации.
+	appLog.DEBUG("Fetching songs with artist filter: ", artistFilter, " and album filter: ", albumFilter)
 
-	query := config.DB
+	// Инициализируем запрос к базе данных, предварительно загружая связанных артистов.
+	query := config.DB.Preload("Artist")
+
 	if artistFilter != "" {
-		query = query.Where("artist = ?", artistFilter)
+		// Присоединяем таблицу артистов и фильтруем по имени артиста.
+		query = query.Joins("JOIN artists ON artists.id = songs.artist_id").Where("artists.name = ?", artistFilter)
 	}
 	if albumFilter != "" {
+		// Фильтруем по названию альбома.
 		query = query.Where("album = ?", albumFilter)
 	}
 
+	// Создаём слайс для хранения песен.
+	var Songs []models.Song
+
+	// Выполняем запрос к базе данных с заданными ограничениям и смещением (пагинация).
 	if err := query.Limit(limit).Offset((page - 1) * limit).Find(&Songs).Error; err != nil {
-		log.Printf("INFO: Error retrieving songs from data base: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error retreving songs"})
+		appLog.Error("Error retrieving songs from database: ", err)
+		// Если возникла ошибка, возвращаем статус 500 и сообщение об ошибке.
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error retrieving songs"})
 		return
 	}
 
-	c.JSON(http.StatusOK, Songs)
-
+	// Создаём слайс для хранения отфильтрованных песен.
 	var filteredSongs []models.Song
 
-	//Фильтрация песен
+	// Фильтрация песен по названию артиста и албома.
 	for _, song := range Songs {
-		if (artistFilter == "" || song.Artist == artistFilter) && (albumFilter == "" || song.Album == albumFilter) {
+		if (artistFilter == "" || song.Artist.Name == artistFilter) && (albumFilter == "" || song.Album == albumFilter) {
 			filteredSongs = append(filteredSongs, song)
 		}
 	}
 
-	// Пагинация
+	// Рассчитываем начальный и конечный индексы для пагинации отфильтрованных песен.
 	start := (page - 1) * limit
 	end := start + limit
 	if start > len(filteredSongs) {
@@ -64,9 +73,11 @@ func GetSongs(c *gin.Context) {
 	if end > len(filteredSongs) {
 		end = len(filteredSongs)
 	}
+
+	// Получаем подмножество песен после фильтрации и пагинации.
 	paginatedSongs := filteredSongs[start:end]
-	log.Printf("INFO: Total songs retrieved: %d", len(paginatedSongs))
+	appLog.Info("Total songs retrieved: ", len(paginatedSongs))
 
+	// Возвращаем отфильтрованные и пагинированные песни в JSON-формате.
 	c.JSON(http.StatusOK, paginatedSongs)
-
 }
