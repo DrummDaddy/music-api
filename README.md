@@ -39,9 +39,9 @@ go run main.go
 4. **Использование Docker(опционально)** 
 
 - Соберите Docker-образ приложения: 
-docker build -t song-library .
+docker build -t  music-api.
 - Запуск контейнера: 
-docker run -d -p 8080:8080 song library 
+docker run -d -p 8080:8080 music-api 
 Приложение также будет доступно по адресу http:/localhost:8080. 
 
 
